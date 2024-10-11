@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -62,5 +63,6 @@ public class UserEntity implements Serializable, UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 
 }

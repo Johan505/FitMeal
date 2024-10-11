@@ -38,6 +38,7 @@ public class SpringSecurityConfig {
                                         .requestMatchers(HttpMethod.POST, "/users/**").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                                        .requestMatchers(HttpMethod.POST, "/api/user-profile/**").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/api/api-docs").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/api/swagger-ui.html").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/api/swagger-ui/**").permitAll()
@@ -62,6 +63,7 @@ public class SpringSecurityConfig {
                                         .requestMatchers("/app/ws").permitAll()
 
                                         .anyRequest().authenticated()
+
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
