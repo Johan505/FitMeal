@@ -10,24 +10,18 @@ import lombok.*;
 @Setter
 public class UserProfileDTO {
 
-    @NotNull(message = "El peso es obligatorio.")
-    @Positive(message = "El peso debe ser un número positivo.")
+    @NotNull(message = "Weight is required.")
+    @Positive(message = "Weight must be a positive number.")
     private Double weight;
 
-    @NotNull(message = "La estatura es obligatoria.")
-    @Positive(message = "La estatura debe ser un número positivo.")
+    @NotNull(message = "Height is required.")
+    @Positive(message = "Height must be a positive number.")
     private Double height;
 
-    @NotNull(message = "El objetivo es obligatorio.")
-    @Size(min = 1, max = 50, message = "El objetivo debe tener entre 1 y 50 caracteres.")
+    @NotNull(message = "Goal is required.")
+    @Size(min = 1, max = 50, message = "Goal must be between 1 and 50 characters.")
     private String goal;
 
-    @NotNull(message = "El sexo es obligatorio.")
+    @NotNull(message = "Sex is required.")
     private String sex;
-
-    @Positive(message = "Las calorías deben ser un número positivo.")
-    private double caloriesNeeded;
-
-    @Positive(message = "El IMC debe ser un número positivo.")
-    private double imc;
 }

@@ -21,24 +21,28 @@ public class UserProfileController {
     }
 
     @PostMapping("/{userId}")
-    public ResponseEntity<String> createUserProfile(
+    public ResponseEntity<String> validateAndSaveProfile(
             @PathVariable String userId,
             @RequestBody @Validated UserProfileDTO userProfileDTO) {
 
-        // Convertir el DTO a la entidad UserProfile
+        // Convert DTO to UserProfile entity (without setting imc and caloriesNeeded)
         UserProfile userProfile = UserProfile.builder()
                 .weight(userProfileDTO.getWeight())
                 .height(userProfileDTO.getHeight())
                 .goal(userProfileDTO.getGoal())
                 .sex(userProfileDTO.getSex())
-                .caloriesNeeded(userProfileDTO.getCaloriesNeeded())
-                .imc(userProfileDTO.getImc())
                 .build();
 
-        // Crear el perfil de usuario (usamos el UUID como string)
-        userProfileService.createUserProfile(userId, userProfile);
+        // Validate and save profile
+        String result = userProfileService.validateAndSaveProfile(userId, userProfile);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Perfil creado exitosamente.");
+        // Check if profile was saved or if there was a warning
+        if (result.startsWith("It's not recommended")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
+
 
 }
