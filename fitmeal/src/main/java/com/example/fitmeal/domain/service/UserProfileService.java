@@ -2,9 +2,8 @@ package com.example.fitmeal.domain.service;
 
 import com.example.fitmeal.domain.model.entity.User;
 import com.example.fitmeal.domain.port.dao.MealPlanDao;
-import com.example.fitmeal.infrastructure.adapter.dataSources.jpa.entity.MealPlan;
-import com.example.fitmeal.infrastructure.adapter.dataSources.jpa.entity.UserEntity;
-import com.example.fitmeal.infrastructure.adapter.dataSources.jpa.entity.UserProfile;
+import com.example.fitmeal.domain.port.dao.UserMealPlanDao;
+import com.example.fitmeal.infrastructure.adapter.dataSources.jpa.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +11,9 @@ import com.example.fitmeal.domain.port.dao.UserProfileDao;
 import com.example.fitmeal.domain.port.dao.UserDao;
 import com.example.fitmeal.infrastructure.adapter.mapper.UserDboMapper;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,21 +23,28 @@ public class UserProfileService {
     private final UserProfileDao userProfileDao;
     private final UserDao userDao;
     private final UserDboMapper userDboMapper;
-
     private final MealPlanDao mealPlanDao;
 
+    private final UserMealPlanDao userMealPlanDao;
+
     @Autowired
-    public UserProfileService(UserProfileDao userProfileDao, UserDao userDao, MealPlanDao mealPlanDao, UserDboMapper userDboMapper) {
+    public UserProfileService(UserProfileDao userProfileDao, UserDao userDao, MealPlanDao mealPlanDao, UserMealPlanDao userMealPlanDao, UserDboMapper userDboMapper) {
         this.userProfileDao = userProfileDao;
         this.userDao = userDao;
         this.userDboMapper = userDboMapper;
         this.mealPlanDao = mealPlanDao;
+        this.userMealPlanDao = userMealPlanDao;
     }
 
     public String validateAndSaveProfile(String userId, UserProfile userProfile) {
         // Calculate BMI
         double bmi = userProfile.getWeight() / (userProfile.getHeight() * userProfile.getHeight());
-        userProfile.setImc(bmi);
+
+        // Round BMI to 2 decimal places
+        double roundedBmi = BigDecimal.valueOf(bmi)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+        userProfile.setImc(roundedBmi);
 
         // Validate height (between 1.0 and 2.5 meters)
         if (userProfile.getHeight() < 1.0 || userProfile.getHeight() > 2.5) {
@@ -98,7 +107,12 @@ public class UserProfileService {
                 userProfile.getAge(),
                 userProfile.getActivityLevel()
         );
-        userProfile.setCaloriesNeeded(caloriesNeeded);
+
+        // Round calories needed to 2 decimal places
+        double roundedCaloriesNeeded = BigDecimal.valueOf(caloriesNeeded)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+        userProfile.setCaloriesNeeded(roundedCaloriesNeeded);
 
         // If everything is valid, save the profile
         User user = userDao.getById(userId);
@@ -145,12 +159,76 @@ public class UserProfileService {
         return baseCalories * activityMultiplier;
     }
 
-    public Optional<MealPlan> recommendMealPlan(UserProfile userProfile) {
-        // Definir un rango de calorías aceptable (por ejemplo, ±200 calorías)
+
+
+    public List<Meal> recommendMealsForUser(String userId) {
+        // Buscar el perfil del usuario
+        Optional<UserProfile> userProfileOpt = userProfileDao.findByUser_Id(userId);
+
+        if (userProfileOpt.isEmpty()) {
+            throw new IllegalArgumentException("User profile not found.");
+        }
+
+        UserProfile userProfile = userProfileOpt.get();
+
+        // Definir un rango de calorías aceptable para buscar el MealPlan
         double minCalories = userProfile.getCaloriesNeeded() - 200;
         double maxCalories = userProfile.getCaloriesNeeded() + 200;
 
-        // Buscar el plan de alimentación adecuado
-        return mealPlanDao.findTopByMealTypeAndTotalCaloriesBetween(userProfile.getGoal(), minCalories, maxCalories);
+        // Obtener el MealPlan adecuado para el objetivo del usuario y calorías
+        Optional<MealPlan> mealPlanOpt = mealPlanDao.findTopByMealTypeAndTotalCaloriesBetween(
+                userProfile.getGoal(),
+                minCalories,
+                maxCalories
+        );
+
+        if (mealPlanOpt.isEmpty()) {
+            throw new IllegalArgumentException("No suitable meal plan found for this user's goal and caloric needs.");
+        }
+
+        MealPlan mealPlan = mealPlanOpt.get();
+
+        // Devolver las comidas asociadas al MealPlan
+        return mealPlan.getMeals();
     }
+
+
+    public String assignMealPlanToUserProfile(String userId) {
+        // Buscar el perfil del usuario guardado
+        Optional<UserProfile> userProfileOpt = userProfileDao.findByUser_Id(userId);
+        if (userProfileOpt.isEmpty()) {
+            throw new IllegalArgumentException("User profile not found.");
+        }
+
+        UserProfile userProfile = userProfileOpt.get();
+        double minCalories = userProfile.getCaloriesNeeded() - 200;
+        double maxCalories = userProfile.getCaloriesNeeded() + 200;
+
+        // Buscar el MealPlan adecuado
+        Optional<MealPlan> recommendedMealPlan = mealPlanDao.findTopByMealTypeAndTotalCaloriesBetween(
+                userProfile.getGoal(), minCalories, maxCalories);
+
+        if (recommendedMealPlan.isPresent()) {
+            MealPlan mealPlan = recommendedMealPlan.get();
+
+            // Crear una instancia de UserMealPlan
+            UserMealPlan userMealPlan = UserMealPlan.builder()
+                    .user(userProfile.getUser())
+                    .mealPlan(mealPlan)
+                    .personalizedCalories(userProfile.getCaloriesNeeded())
+                    .build();
+
+            // Guardar el UserMealPlan en la base de datos
+            userMealPlan = userMealPlanDao.save(userMealPlan);
+
+            // Asignar el UserMealPlan al perfil y actualizarlo
+            userProfile.setCurrentMealPlan(userMealPlan);
+            userProfileDao.createUserProfile(userProfile); // Actualizar el perfil con el plan asignado
+
+            return "Meal plan assigned: " + mealPlan.getName();
+        } else {
+            return "No suitable meal plan found.";
+        }
+    }
+
 }

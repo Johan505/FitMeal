@@ -2,12 +2,15 @@ package com.example.fitmeal.infrastructure.rest.controller;
 
 import com.example.fitmeal.domain.model.dto.UserProfileDTO;
 import com.example.fitmeal.domain.service.UserProfileService;
+import com.example.fitmeal.infrastructure.adapter.dataSources.jpa.entity.Meal;
 import com.example.fitmeal.infrastructure.adapter.dataSources.jpa.entity.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user-profile")
@@ -44,4 +47,31 @@ public class UserProfileController {
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
+
+
+    // Endpoint para asignar automáticamente el plan de comidas basado en el perfil del usuario
+    // POST: Asignar un plan de comidas a un perfil de usuario existente
+    @PostMapping("/{userId}/assign-meal-plan")
+    public ResponseEntity<String> assignMealPlanToUserProfile(@PathVariable String userId) {
+        String result = userProfileService.assignMealPlanToUserProfile(userId);
+
+        if (result.startsWith("Meal plan assigned:")) {
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        }
+    }
+
+    // GET: Obtener las comidas recomendadas para el día actual
+    @GetMapping("/{userId}/recommended-meals")
+    public ResponseEntity<List<Meal>> getRecommendedMealsForToday(@PathVariable String userId) {
+        try {
+            List<Meal> meals = userProfileService.recommendMealsForUser(userId);
+            return ResponseEntity.status(HttpStatus.OK).body(meals);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+
 }

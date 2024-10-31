@@ -1,4 +1,5 @@
 package com.example.fitmeal.infrastructure.adapter.dataSources.jpa.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -29,8 +30,15 @@ public class MealPlan {
     @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL)
     private List<UserMealPlan> userMealPlans;
 
+    @ManyToMany
+    @JoinTable(
+            name = "meal_plan_meals",
+            joinColumns = @JoinColumn(name = "meal_plan_id"),
+            inverseJoinColumns = @JoinColumn(name = "meal_id")
+    )
+    private List<Meal> meals; // Lista de comidas asociadas a este plan de comidas
+
     @ManyToOne
     @JoinColumn(name = "goal_id", referencedColumnName = "id")
     private Goal goal;
-
 }
