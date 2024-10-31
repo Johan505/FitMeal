@@ -4,6 +4,7 @@ import com.example.fitmeal.domain.port.dao.UserProfileDao;
 import com.example.fitmeal.infrastructure.adapter.dataSources.jpa.UserProfileSpringJpaAdapterRepository;
 import com.example.fitmeal.infrastructure.adapter.dataSources.jpa.entity.UserProfile;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 @Repository
 public class UserProfilePostgresDao implements UserProfileDao {
@@ -17,5 +18,10 @@ public class UserProfilePostgresDao implements UserProfileDao {
     @Override
     public void createUserProfile(UserProfile userProfile) {
         userProfileRepository.save(userProfile);
+    }
+
+    @Override
+    public Optional<UserProfile> findByUser_Id(String userId) {
+        return userProfileRepository.findByUser_Id(userId);
     }
 }

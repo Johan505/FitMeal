@@ -1,6 +1,6 @@
 package com.example.fitmeal.domain.model.dto;
 
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -24,4 +24,11 @@ public class UserProfileDTO {
 
     @NotNull(message = "Sex is required.")
     private String sex;
+
+    @NotNull(message = "Age is required.")
+    @Min(value = 1, message = "Age must be greater than 0.")
+    private Integer age;
+
+    @NotNull(message = "Activity level is required.")
+    private Integer activityLevel;
 }

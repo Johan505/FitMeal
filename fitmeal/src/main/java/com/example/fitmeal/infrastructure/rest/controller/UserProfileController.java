@@ -25,24 +25,23 @@ public class UserProfileController {
             @PathVariable String userId,
             @RequestBody @Validated UserProfileDTO userProfileDTO) {
 
-        // Convert DTO to UserProfile entity (without setting imc and caloriesNeeded)
+        // Convertir DTO a entidad UserProfile incluyendo todos los campos
         UserProfile userProfile = UserProfile.builder()
                 .weight(userProfileDTO.getWeight())
                 .height(userProfileDTO.getHeight())
                 .goal(userProfileDTO.getGoal())
                 .sex(userProfileDTO.getSex())
+                .age(userProfileDTO.getAge()) // Asegúrate de asignar la edad
+                .activityLevel(userProfileDTO.getActivityLevel()) // Asegúrate de asignar el nivel de actividad
                 .build();
 
-        // Validate and save profile
+        // Validar y guardar el perfil
         String result = userProfileService.validateAndSaveProfile(userId, userProfile);
 
-        // Check if profile was saved or if there was a warning
+        // Comprobar si el perfil fue guardado o si hubo alguna advertencia
         if (result.startsWith("It's not recommended")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
         }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
-
-
 }
