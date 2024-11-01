@@ -48,7 +48,6 @@ public class UserProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-
     // Endpoint para asignar automáticamente el plan de comidas basado en el perfil del usuario
     // POST: Asignar un plan de comidas a un perfil de usuario existente
     @PostMapping("/{userId}/assign-meal-plan")
