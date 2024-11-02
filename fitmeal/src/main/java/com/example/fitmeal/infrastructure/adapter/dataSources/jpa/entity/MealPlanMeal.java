@@ -27,4 +27,6 @@ public class MealPlanMeal {
     @Column(nullable = false, length = 50)
     private String mealTime; // desayuno, almuerzo, cena, snack
 
+    @Column(nullable = false)
+    private int dayOfWeek; // 1 = Lunes, 2 = Martes, ..., 7 = Domingo
 }

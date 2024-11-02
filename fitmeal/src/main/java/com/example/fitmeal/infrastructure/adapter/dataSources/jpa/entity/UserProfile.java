@@ -15,7 +15,6 @@ public class UserProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private double weight;
     private double height;
     private String goal;

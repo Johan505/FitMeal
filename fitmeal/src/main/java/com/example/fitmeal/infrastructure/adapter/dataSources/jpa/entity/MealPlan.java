@@ -28,15 +28,7 @@ public class MealPlan {
     private double fatPercentage;
 
     @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL)
-    private List<UserMealPlan> userMealPlans;
-
-    @ManyToMany
-    @JoinTable(
-            name = "meal_plan_meals",
-            joinColumns = @JoinColumn(name = "meal_plan_id"),
-            inverseJoinColumns = @JoinColumn(name = "meal_id")
-    )
-    private List<Meal> meals; // Lista de comidas asociadas a este plan de comidas
+    private List<MealPlanMeal> mealPlanMeals; // Lista de MealPlanMeal asociadas a este plan
 
     @ManyToOne
     @JoinColumn(name = "goal_id", referencedColumnName = "id")
