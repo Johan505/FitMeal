@@ -9,6 +9,5 @@ import java.util.Optional;
 public interface MealPlanDao extends JpaRepository<MealPlan, Long> {
 
     // Asegúrate de que `mealType` es un String y `totalCalories` es un rango Double
-    Optional<MealPlan> findTopByMealTypeAndTotalCaloriesBetween(String mealType, double minCalories, double maxCalories);
+    Optional<MealPlan> findTopByGoal_IdAndTotalCaloriesBetween(Long goalId, double minCalories, double maxCalories);
 }
-

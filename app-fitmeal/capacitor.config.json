@@ -1,0 +1,6 @@
+{
+  "appId": "com.miapp.fitmeal",
+  "appName": "FitMeal",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

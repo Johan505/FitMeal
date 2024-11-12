@@ -22,15 +22,18 @@ public class MealPlan {
     private String mealType; // Por ejemplo, "déficit calórico" o "superávit calórico"
     private double totalCalories;
 
-    // Distribución de macronutrientes en porcentaje
     private double carbPercentage;
     private double proteinPercentage;
     private double fatPercentage;
 
     @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL)
-    private List<MealPlanMeal> mealPlanMeals; // Lista de MealPlanMeal asociadas a este plan
+    private List<MealPlanMeal> mealPlanMeals;
 
     @ManyToOne
     @JoinColumn(name = "goal_id", referencedColumnName = "id")
     private Goal goal;
+
+    @ManyToOne
+    @JoinColumn(name = "diet_type_id", referencedColumnName = "id")
+    private DietType dietType;
 }

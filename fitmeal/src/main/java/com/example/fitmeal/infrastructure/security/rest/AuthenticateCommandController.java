@@ -8,11 +8,9 @@ import com.example.fitmeal.infrastructure.security.service.AuthenticationService
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/auth")
 public class AuthenticateCommandController {
@@ -25,7 +23,7 @@ public class AuthenticateCommandController {
         this.authenticationService = authenticationService;
         this.jwtUtilities = jwtUtilities;
     }
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/token")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.signIn(request));

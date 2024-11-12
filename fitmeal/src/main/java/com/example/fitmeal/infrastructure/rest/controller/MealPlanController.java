@@ -1,5 +1,6 @@
 package com.example.fitmeal.infrastructure.rest.controller;
 
+import com.example.fitmeal.domain.model.dto.command.MealDTO;
 import com.example.fitmeal.domain.service.MealPlanService;
 import com.example.fitmeal.infrastructure.adapter.dataSources.jpa.entity.Meal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class MealPlanController {
         this.mealPlanService = mealPlanService;
     }
 
-    @PostMapping("/{userId}/assign")
+    @PostMapping("/assign/{userId}")
     public ResponseEntity<String> assignMealPlanToUserProfile(@PathVariable String userId) {
         String result = mealPlanService.assignMealPlanToUserProfile(userId);
 
@@ -31,16 +32,22 @@ public class MealPlanController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    @GetMapping("/{userId}/daily-meals")
-    public ResponseEntity<List<Meal>> getMealsForToday(@PathVariable String userId) {
-        List<Meal> mealsForToday = mealPlanService.getMealsForToday(userId);
+    // Endpoint para obtener las comidas del día
+    @GetMapping("/daily-meals/{userId}")
+    public ResponseEntity<List<MealDTO>> getMealsForToday(@PathVariable String userId) {
+        List<MealDTO> mealsForToday = mealPlanService.getMealsForToday(userId);
         return ResponseEntity.ok(mealsForToday);
     }
-
-    // Ruta para obtener las comidas de la semana
-    @GetMapping("/{userId}/weekly-meals")
-    public ResponseEntity<Map<Integer, List<Meal>>> getWeeklyMealPlan(@PathVariable String userId) {
-        Map<Integer, List<Meal>> weeklyMealPlan = mealPlanService.getWeeklyMealPlan(userId);
-        return ResponseEntity.ok(weeklyMealPlan);
+    @GetMapping("/weekly-meals/{userId}")
+    public ResponseEntity<List<MealDTO>> getWeeklyMealPlan(@PathVariable String userId) {
+        try {
+            // Llamar al servicio para obtener las comidas
+            List<MealDTO> mealsForThisWeek = mealPlanService.getWeeklyMealPlan(userId);
+            return ResponseEntity.ok(mealsForThisWeek);
+        } catch (IllegalArgumentException e) {
+            // Si el perfil del usuario no se encuentra, devolver error 404
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
+
 }

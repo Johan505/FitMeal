@@ -1,0 +1,47 @@
+.container-form {
+  display: flex;
+  justify-content: center;
+  height: 90vh;
+  padding: 20px 10px;
+  font-family: "Inter";
+}
+
+.info-form {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+.info-form h2 {
+  color: #d15e0d;
+}
+
+.info-form p {
+  color: #403f3f;
+}
+
+.form-complete-profile {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-complete-profile label {
+  color: #d15e0d;
+  margin: 10px 0;
+  font-weight: 600;
+}
+
+.input-cprofile {
+  border: 1px solid #403f3f;
+  padding: 10px;
+  border-radius: 20px;
+  color: #403f3f;
+}
+
+.btn-cprofile {
+  border: 1px solid #d15e0d;
+  background-color: #d15e0d;
+  padding: 1em;
+  border-radius: 20px;
+  color: #fff;
+  margin: 2em 0;
+}

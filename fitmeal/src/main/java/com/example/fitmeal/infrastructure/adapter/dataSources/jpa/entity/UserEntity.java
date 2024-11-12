@@ -1,6 +1,5 @@
 package com.example.fitmeal.infrastructure.adapter.dataSources.jpa.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,8 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -20,19 +17,20 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 public class UserEntity implements Serializable, UserDetails {
+
     @Id
     private String id = UUID.randomUUID().toString();
 
     private String lastName;
-
     private String firstName;
-
     private String email;
-
     private String password;
 
     @Column
     private boolean isVerified = false;
+
+    @OneToOne(mappedBy = "user")
+    private UserProfile userProfile;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -63,6 +61,4 @@ public class UserEntity implements Serializable, UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-
 }

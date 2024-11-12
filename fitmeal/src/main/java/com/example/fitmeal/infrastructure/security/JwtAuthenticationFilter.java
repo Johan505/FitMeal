@@ -31,27 +31,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         try {
-            String token = jwtUtilities.getToken(request) ;
+            log.debug("Starting JWT authentication filter");
+            String token = jwtUtilities.getToken(request);
+            log.debug("Token retrieved: {}", token);
 
-            if (token!=null && jwtUtilities.validateToken(token))
-            {
+            if (token != null && jwtUtilities.validateToken(token)) {
                 String email = jwtUtilities.extractUsername(token);
+                log.debug("Extracted username from token: {}", email);
 
                 UserDetails userDetails = customerUserDetailsService.loadUserByUsername(email);
                 if (userDetails != null) {
                     UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails.getUsername() ,null , userDetails.getAuthorities());
-                    log.info("authenticated user with email :{}", email);
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    log.info("Authenticated user with email: {}", email);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-
                 }
+            } else {
+                log.warn("Token is null or invalid");
             }
         } catch (ExpiredJwtException e) {
+            log.warn("Token has expired");
             SecurityContextHolder.clearContext();
-            throw e;
+        } catch (Exception e) {
+            log.error("Error processing JWT authentication", e);
+            SecurityContextHolder.clearContext();
         }
-        filterChain.doFilter(request,response);
-
+        filterChain.doFilter(request, response);
     }
+
 
 }

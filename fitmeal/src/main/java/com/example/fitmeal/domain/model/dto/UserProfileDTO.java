@@ -1,6 +1,5 @@
 package com.example.fitmeal.domain.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -18,9 +17,8 @@ public class UserProfileDTO {
     @Positive(message = "Height must be a positive number.")
     private Double height;
 
-    @NotNull(message = "Goal is required.")
-    @Size(min = 1, max = 50, message = "Goal must be between 1 and 50 characters.")
-    private String goal;
+    @NotNull(message = "Goal ID is required.")
+    private Long goalId;
 
     @NotNull(message = "Sex is required.")
     private String sex;
@@ -31,4 +29,9 @@ public class UserProfileDTO {
 
     @NotNull(message = "Activity level is required.")
     private Integer activityLevel;
+
+    // Campos adicionales de UserProfile
+    private Double caloriesNeeded;
+    private Double imc;
+    private Long currentMealPlanId; // ID del plan de comida actual
 }

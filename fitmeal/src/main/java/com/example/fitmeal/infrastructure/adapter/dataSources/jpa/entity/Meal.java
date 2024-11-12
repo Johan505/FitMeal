@@ -29,8 +29,12 @@ public class Meal {
     private double fat;
 
     @Column(nullable = false)
+    private String servingsize;
+
+    @Column(nullable = false)
     private double carbs;
 
-    @Column(nullable = false, length = 50)
-    private String mealType; // desayuno, almuerzo, cena, snack
+    @ManyToOne
+    @JoinColumn(name = "meal_type_id", referencedColumnName = "id")
+    private MealType mealType;
 }

@@ -15,9 +15,9 @@ public class UserProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private double weight;
     private double height;
-    private String goal;
     private String sex;
     private double caloriesNeeded;
     private double imc;
@@ -30,6 +30,12 @@ public class UserProfile {
 
     @OneToOne
     @JoinColumn(name = "current_meal_plan_id", referencedColumnName = "id")
-    private UserMealPlan currentMealPlan; // Plan de alimentación actual del usuario
+    private UserMealPlan currentMealPlan;
 
+    // Relación con la entidad Goal
+    @ManyToOne
+    @JoinColumn(name = "goal_id", referencedColumnName = "id")
+    private Goal goal;  // Relación con la tabla Goal
+
+    // Otros métodos y getters/setters
 }

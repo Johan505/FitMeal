@@ -1,5 +1,6 @@
 package com.example.fitmeal.domain.service;
 
+import com.example.fitmeal.domain.model.dto.UserProfileDTO;
 import com.example.fitmeal.domain.model.entity.User;
 import com.example.fitmeal.domain.port.dao.UserDao;
 import com.example.fitmeal.domain.port.dao.UserProfileDao;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -59,4 +61,20 @@ public class UserProfileService {
     public String assignMealPlanToUserProfile(String userId) {
         return mealPlanService.assignMealPlanToUserProfile(userId);
     }
+
+    public Optional<UserProfileDTO> getUserProfileByUserId(String userId) {
+        return userProfileDao.findByUser_Id(userId)
+                .map(userProfile -> new UserProfileDTO(
+                        userProfile.getWeight(),
+                        userProfile.getHeight(),
+                        userProfile.getGoal().getId(), // ID del objetivo
+                        userProfile.getSex(),
+                        userProfile.getAge(),
+                        userProfile.getActivityLevel(),
+                        userProfile.getCaloriesNeeded(), // Calorías necesarias
+                        userProfile.getImc(), // IMC
+                        userProfile.getCurrentMealPlan() != null ? userProfile.getCurrentMealPlan().getId() : null // ID del plan de comida actual
+                ));
+    }
+
 }
